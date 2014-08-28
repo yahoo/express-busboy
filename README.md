@@ -46,3 +46,5 @@ If needed, we could potentially add a filter for which url's have the ability to
 
 build
 -----
+
+[![Build Status](https://travis-ci.org/yahoo/express-busboy.svg?branch=master)](https://travis-ci.org/yahoo/express-busboy)
