@@ -1,7 +1,11 @@
 express-busboy
 --------------
 
-A simple `body-parser` like module for express that uses [`connect-busboy`](https://github.com/mscdex/connect-busboy) under the hood.
+A simple `body-parser` like module for express that 
+uses [`connect-busboy`](https://github.com/mscdex/connect-busboy) under the hood.
+
+It's designed to be more of a "drop in" replacement for `body-parser`.
+With it populating `req.body`, there is very minimal code change needed to use it.
 
 usage
 -----
@@ -38,7 +42,7 @@ bb.extend(app, {
 
 `path` will default to: `os.tmpdir()/express-busboy/<uuid>/<the field name>/<filename>`.
 
-If needed, we could potentially add a filter that we can filter which url's have the ability to upload files.
+If needed, we could potentially add a filter for which url's have the ability to upload files.
 
 build
 -----
