@@ -1,41 +1,41 @@
 {
-  "name": "express-busboy",
-  "description": "Busboy for express, mimics the old bodyParser",
-  "version": "0.0.1",
-  "author": "Dav Glass <davglass@gmail.com>",
-  "main": "index.js",
-  "scripts": {
-    "test": "istanbul cover --print both vows -- --spec ./tests/*.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:yahoo/express-busboy.git"
-  },
-  "keywords": [
-    "busboy",
-    "express",
-    "body-parser"
-  ],
-  "bugs": {
-    "url": "https://github.com/yahoo/express-busboy/issues"
-  },
-  "homepage": "https://github.com/yahoo/express-busboy",
-  "dependencies": {
-    "connect-busboy": "~0.0.1",
-    "mkdirp": "~0.5.0",
-    "uuid": "~1.4.1"
-  },
-  "devDependencies": {
-    "express": "~4.8.6",
-    "istanbul": "~0.3.0",
-    "portfinder": "~0.2.1",
-    "request": "~2.40.0",
-    "vows": "~0.7.0"
-  },
-  "licenses": [
-    {
-      "type": "BSD",
-      "url": "https://github.com/yahoo/express-busboy/blob/master/LICENSE"
-    }
-  ]
+    "name": "express-busboy",
+    "description": "Busboy for express, mimics the old bodyParser",
+    "version": "0.0.1",
+    "author": "Dav Glass <davglass@gmail.com>",
+    "main": "index.js",
+    "scripts": {
+        "test": "istanbul cover --print both vows -- --spec ./tests/*.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git@github.com:yahoo/express-busboy.git"
+    },
+    "keywords": [
+        "busboy",
+        "express",
+        "body-parser"
+    ],
+    "bugs": {
+        "url": "https://github.com/yahoo/express-busboy/issues"
+    },
+    "homepage": "https://github.com/yahoo/express-busboy",
+    "dependencies": {
+        "connect-busboy": "~0.0.1",
+        "mkdirp": "~0.5.0",
+        "uuid": "~1.4.1"
+    },
+    "devDependencies": {
+        "express": "~4.8.6",
+        "istanbul": "~0.3.0",
+        "portfinder": "~0.2.1",
+        "request": "~2.40.0",
+        "vows": "~0.7.0"
+    },
+    "licenses": [
+        {
+            "type": "BSD",
+            "url": "https://github.com/yahoo/express-busboy/blob/master/LICENSE"
+        }
+    ]
 }
