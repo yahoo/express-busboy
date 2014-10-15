@@ -16,7 +16,7 @@ exports.extend = function(app, options) {
     if (app[key]) { return app; }
     Object.defineProperty(app, key, { value: exports });
     options = options || {};
-    options.immediate = true;
+    options.immediate = false; //Remove if the user sets it
     options.path = options.path || path.join(os.tmpdir(), 'express-busboy');
 
     app.use(busboy(options));
@@ -50,6 +50,7 @@ exports.extend = function(app, options) {
         req.busboy.on('finish', function() {
             next();
         });
+        req.pipe(req.busboy);
     });
 
     return app;
