@@ -10,6 +10,7 @@ var busboy = require('connect-busboy'),
     uuid = require('uuid'),
     fs = require('fs'),
     mkdirp = require('mkdirp'),
+    qs = require('qs'),
     os = require('os');
 
 exports.extend = function(app, options) {
@@ -48,9 +49,10 @@ exports.extend = function(app, options) {
             });
         }
         req.busboy.on('field', function(fieldname, val) {
-              req.body[fieldname] = val;
+            req.body[fieldname] = val;
         });
         req.busboy.on('finish', function() {
+            req.body = qs.parse(qs.stringify(req.body));
             next();
         });
         req.pipe(req.busboy);

@@ -23,6 +23,7 @@
   "dependencies": {
     "connect-busboy": "~0.0.1",
     "mkdirp": "~0.5.0",
+    "qs": "^2.3.2",
     "uuid": "~1.4.1"
   },
   "devDependencies": {

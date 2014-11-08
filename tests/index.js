@@ -87,6 +87,8 @@ var tests = {
                     url: base + '/',
                     json: true,
                     form: {
+                        obj: { one: 1, two: 2, three: 3, four: 4 },
+                        data: [1, 2, 3, 4],
                         foo: 1,
                         bar: 2,
                         baz: 3
@@ -103,6 +105,18 @@ var tests = {
                 assert.equal(d.body.foo, 1);
                 assert.equal(d.body.bar, 2);
                 assert.equal(d.body.baz, 3);
+                assert.ok(d.body.data);
+                assert.ok(Array.isArray(d.body.data));
+                assert.equal(d.body.data[0], 1);
+                assert.equal(d.body.data[1], 2);
+                assert.equal(d.body.data[2], 3);
+                assert.equal(d.body.data[3], 4);
+                assert.ok(d.body.obj);
+                assert.equal(typeof d.body.obj, 'object');
+                assert.equal(d.body.obj.one, 1);
+                assert.equal(d.body.obj.two, 2);
+                assert.equal(d.body.obj.three, 3);
+                assert.equal(d.body.obj.four, 4);
             }
         },
         'and should upload a file': {
