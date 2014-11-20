@@ -208,6 +208,34 @@ var tests = {
                 assert.equal(d.body.obj.four, 4);
             }
         },
+        'and should parse post body inline': {
+            topic: function() {
+                var done = this.callback;
+                request({
+                    method: 'POST',
+                    url: base + '/',
+                    json: true,
+                    form: 'foo=1&bar=2&baz=3&data=1&data=2&data=3&data=4'
+                }, function(err, res, body) {
+                    done(err, body);
+                });
+            },
+            'properly': function(d) {
+                assert.ok(d);
+                assert.ok(d.body);
+                assert.ok(d.files);
+                assert.equal(Object.keys(d.files).length, 0);
+                assert.equal(d.body.foo, 1);
+                assert.equal(d.body.bar, 2);
+                assert.equal(d.body.baz, 3);
+                assert.ok(d.body.data);
+                assert.ok(Array.isArray(d.body.data));
+                assert.equal(d.body.data[0], 1);
+                assert.equal(d.body.data[1], 2);
+                assert.equal(d.body.data[2], 3);
+                assert.equal(d.body.data[3], 4);
+            }
+        },
     }
 };
 

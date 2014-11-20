@@ -56,7 +56,13 @@ exports.extend = function(app, options) {
                 });
             }
             req.busboy.on('field', function(fieldname, val) {
-                req.body[fieldname] = val;
+                if (Array.isArray(req.body[fieldname])) {
+                    req.body[fieldname].push(val);
+                } else if (req.body[fieldname]) {
+                    req.body[fieldname] = [req.body[fieldname], val];
+                } else {
+                    req.body[fieldname] = val;
+                }
             });
             req.busboy.on('finish', function() {
                 req.body = qs.parse(qs.stringify(req.body));
