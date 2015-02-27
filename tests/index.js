@@ -192,6 +192,63 @@ var tests = {
                 }
             }
         },
+        'and should upload files of the same name': {
+            topic: function() {
+                var done = this.callback;
+                var r = request({
+                    method: 'POST',
+                    url: base + '/',
+                    json: true
+                }, function(err, res, body) {
+                    done(err, body);
+                });
+                var form = r.form();
+                form.append('foobar', 1);
+                form.append('the-file', fs.createReadStream(__filename));
+                form.append('the-file', fs.createReadStream(__filename));
+                form.append('the-file', fs.createReadStream(__filename));
+            },
+            'properly': function(d) {
+                assert.ok(d);
+                assert.ok(d.body);
+                assert.equal(d.body.foobar, 1);
+                assert.ok(d.files);
+                assert.ok(d.files['the-file']);
+                assert.isArray(d.files['the-file']);
+                assert.ok(d.files['the-file'][0].file);
+                assert.ok(d.files['the-file'][1].file);
+                assert.ok(d.files['the-file'][2].file);
+                assert.ok(fs.existsSync(d.files['the-file'][0].file));
+                assert.ok(fs.existsSync(d.files['the-file'][1].file));
+                assert.ok(fs.existsSync(d.files['the-file'][2].file));
+            },
+            'and should not upload a file': {
+                topic: function() {
+                    var done = this.callback;
+                    app._server.close();
+                    app = express();
+                    bb.extend(app);
+                    setup(app);
+                    var r = request({
+                        method: 'POST',
+                        url: base + '/',
+                        json: true
+                    }, function(err, res, body) {
+                        done(err, body);
+                    });
+                    var form = r.form();
+                    form.append('foobar', 1);
+                    form.append('the-file', fs.createReadStream(__filename));
+                },
+                'with no config': function(d) {
+                    assert.ok(d);
+                    assert.equal(d.body.foobar, 1);
+                    assert.ok(d.body);
+                    assert.ok(d.files);
+                    assert.equal(Object.keys(d.files).length, 0);
+                }
+            }
+        },
         'and should parse post body with JSON': {
             topic: function() {
                 var done = this.callback;
