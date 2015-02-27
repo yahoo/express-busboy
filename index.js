@@ -52,7 +52,13 @@ exports.extend = function(app, options) {
                         encoding: encoding,
                         mimetype: mimetype
                     };
-                    req.files[name] = file;
+                    if (Array.isArray(req.files[name])) {
+                        req.files[name].push(file);
+                    } else if (req.files[name]) {
+                        req.files[name] = [req.files[name], file];
+                    } else {
+                        req.files[name] = file;
+                    }
                 });
             }
             req.busboy.on('field', function(fieldname, val) {
