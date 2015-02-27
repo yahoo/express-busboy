@@ -31,7 +31,7 @@ exports.extend = function(app, options) {
             jsonBody(req, res, function(err, body) {
                 req.body = body || {};
                 next();
-            })
+            });
         } else {
             if (!req.busboy) { //Nothing to parse..
                 return next();
@@ -44,7 +44,7 @@ exports.extend = function(app, options) {
                     mkdirp.sync(path.dirname(out));
                     var writer = fs.createWriteStream(out);
                     file.pipe(writer);
-                    var file = {
+                    var data = {
                         uuid: fileUuid,
                         field: name,
                         file: out,
@@ -53,11 +53,11 @@ exports.extend = function(app, options) {
                         mimetype: mimetype
                     };
                     if (Array.isArray(req.files[name])) {
-                        req.files[name].push(file);
+                        req.files[name].push(data);
                     } else if (req.files[name]) {
-                        req.files[name] = [req.files[name], file];
+                        req.files[name] = [req.files[name], data];
                     } else {
-                        req.files[name] = file;
+                        req.files[name] = data;
                     }
                 });
             }
