@@ -29,7 +29,7 @@ exports.extend = function(app, options) {
 
         if (req.is('json')) {
             jsonBody(req, res, function(err, body) {
-                req.body = body;
+                req.body = body || {};
                 next();
             })
         } else {
