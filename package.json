@@ -29,10 +29,10 @@
   },
   "devDependencies": {
     "express": "~4.8.6",
-    "istanbul": "~0.3.0",
+    "istanbul": "~0.3.6",
     "portfinder": "~0.2.1",
     "request": "~2.40.0",
-    "vows": "~0.7.0"
+    "vows": "~0.8.1"
   },
   "licenses": [
     {
