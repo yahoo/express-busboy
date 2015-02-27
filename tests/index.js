@@ -119,6 +119,29 @@ var tests = {
                 assert.equal(d.body.obj.four, 4);
             }
         },
+        'and should handle bad json': {
+            topic: function() {
+                var done = this.callback;
+                var req = request({
+                    method: 'POST',
+                    url: base + '/',
+                    headers: {
+                        'content-type': 'application/json'
+                    }
+                }, function(err, res, body) {
+                    done(err, JSON.parse(body));
+                });
+                req.write('{{{');
+                req.end();
+            },
+            'properly': function(d) {
+                assert.ok(d);
+                assert.ok(d.body);
+                assert.ok(d.files);
+                assert.equal(Object.keys(d.body).length, 0);
+                assert.equal(Object.keys(d.files).length, 0);
+            }
+        },
         'and should upload a file': {
             topic: function() {
                 var done = this.callback;
