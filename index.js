@@ -50,8 +50,15 @@ exports.extend = function(app, options) {
                         file: out,
                         filename: filename,
                         encoding: encoding,
-                        mimetype: mimetype
+                        mimetype: mimetype,
+                        truncated: false
                     };
+
+                    // Indicate whether the file was truncated
+                    file.on('limit', function() {
+                        data.truncated = true;
+                    });
+
                     if (Array.isArray(req.files[name])) {
                         req.files[name].push(data);
                     } else if (req.files[name]) {
