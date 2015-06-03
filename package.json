@@ -34,10 +34,5 @@
     "request": "~2.40.0",
     "vows": "~0.8.1"
   },
-  "licenses": [
-    {
-      "type": "BSD",
-      "url": "https://github.com/yahoo/express-busboy/blob/master/LICENSE"
-    }
-  ]
+  "license": "BSD-3-Clause"
 }
