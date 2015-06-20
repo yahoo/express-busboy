@@ -1,7 +1,7 @@
 {
   "name": "express-busboy",
   "description": "Busboy for express, mimics the old bodyParser",
-  "version": "2.4.2",
+  "version": "2.4.3",
   "author": "Dav Glass <davglass@gmail.com>",
   "main": "index.js",
   "scripts": {
