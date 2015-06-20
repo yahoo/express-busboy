@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/yahoo/express-busboy",
   "dependencies": {
-    "body": "~4.5.0",
+    "body": "~5.1.0",
     "connect-busboy": "~0.0.1",
     "mkdirp": "~0.5.0",
     "qs": "^2.3.2",
