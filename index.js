@@ -28,7 +28,7 @@ exports.extend = function(app, options) {
         req.files = {};
 
         if (req.is('json')) {
-            jsonBody(req, res, function(err, body) {
+            jsonBody(req, res, options, function(err, body) {
                 req.body = body || {};
                 next();
             });
