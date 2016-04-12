@@ -55,6 +55,7 @@ exports.extend = function(app, options) {
                     };
 
                     // Indicate whether the file was truncated
+                    /*istanbul ignore next*/
                     file.on('limit', function() {
                         data.truncated = true;
                     });

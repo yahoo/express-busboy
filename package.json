@@ -5,7 +5,8 @@
   "author": "Dav Glass <davglass@gmail.com>",
   "main": "index.js",
   "scripts": {
-    "test": "istanbul cover --print both vows -- --spec ./tests/*.js"
+    "test": "jenkins-mocha tests/*.js",
+    "posttest": "istanbul check-coverage"
   },
   "repository": {
     "type": "git",
@@ -29,7 +30,8 @@
   },
   "devDependencies": {
     "express": "~4.8.6",
-    "istanbul": "~0.3.6",
+    "istanbul": "^0.4.3",
+    "jenkins-mocha": "^2.6.0",
     "portfinder": "~0.2.1",
     "request": "~2.40.0",
     "vows": "~0.8.1"

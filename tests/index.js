@@ -3,37 +3,24 @@
  * Copyrights licensed under the New BSD License.
  * See the accompanying LICENSE file for terms.
  */
-var vows = require('vows'),
-    assert = require('assert'),
+var assert = require('assert'),
     bb = require('../'),
     express = require('express'),
     app = express();
 
-var tests = {
-    'should export': {
-        topic: function() {
-            return bb;
-        },
-        'an extend method': function(d) {
-            assert.isFunction(d.extend);
-        }
-    },
-    'should extend': {
-        topic: function() {
-            return bb.extend(app, { upload: true });
-        },
-        'app': function(d) {
-            assert.equal(d, app);
-        }
-    },
-    'should not extend': {
-        topic: function() {
-            return bb.extend(app);
-        },
-        'app twice': function(d) {
-            assert.equal(d, app);
-        }
-    }
-};
+describe('express-busboy', function() {
+    
+    it('should export an extend method', function() {
+        assert.equal(typeof bb.extend, 'function');
+    });
 
-vows.describe('express-busboy').addBatch(tests).export(module);
+    it('should extend', function() {
+        var d = bb.extend(app, { upload: true });
+        assert.equal(d, app);
+    });
+    it('should not extend app twice', function() {
+        var d = bb.extend(app);
+        assert.equal(d, app);
+    });
+});
+

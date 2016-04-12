@@ -3,8 +3,7 @@
  * Copyrights licensed under the New BSD License.
  * See the accompanying LICENSE file for terms.
  */
-var vows = require('vows'),
-    assert = require('assert'),
+var assert = require('assert'),
     bb = require('../'),
     express = require('express'),
     fs = require('fs'),
@@ -25,78 +24,66 @@ var setup = function(app) {
     });
 };
 
-var tests = {
-    'setup hack': {
-        topic: function() {
-            var done = this.callback;
-            portfinder.getPort(function(e, p) {
-                port = p;
-                setup(app);
-                base += p;
-                done();
-            });
-        },
-        'complete': function() {},
-        'and should upload a file': {
-            topic: function() {
-                var done = this.callback;
-                var r = request({
-                    method: 'POST',
-                    url: base + '/',
-                    json: true
-                }, function(err, res, body) {
-                    done(err, body);
-                });
-                var form = r.form();
-                form.append('foobar', 1);
-                form.append('the-file', fs.createReadStream(__filename));
-            },
-            'properly': function(d) {
-                assert.ok(d);
-                assert.ok(d.body);
-                assert.equal(d.body.foobar, 1);
-                assert.ok(d.files);
-                assert.ok(d.files['the-file']);
-                assert.ok(d.files['the-file'].file);
-                assert.ok(fs.existsSync(d.files['the-file'].file));
-            }
-        },
-        'and should upload files of the same name': {
-            topic: function() {
-                var done = this.callback;
-                var r = request({
-                    method: 'POST',
-                    url: base + '/',
-                    json: true
-                }, function(err, res, body) {
-                    done(err, body);
-                });
-                var form = r.form();
-                form.append('foobar', 1);
-                form.append('the-file', fs.createReadStream(__filename));
-                form.append('the-file', fs.createReadStream(__filename));
-                form.append('the-file', fs.createReadStream(__filename));
-            },
-            'properly': function(d) {
-                assert.ok(d);
-                assert.ok(d.body);
-                assert.equal(d.body.foobar, 1);
-                assert.ok(d.files);
-                assert.ok(d.files['the-file']);
-                assert.isArray(d.files['the-file']);
-                assert.ok(d.files['the-file'][0].file);
-                assert.ok(d.files['the-file'][1].file);
-                assert.ok(d.files['the-file'][2].file);
-                assert.ok(fs.existsSync(d.files['the-file'][0].file));
-                assert.ok(fs.existsSync(d.files['the-file'][1].file));
-                assert.ok(fs.existsSync(d.files['the-file'][2].file));
-            }
-        }
-    },
-    teardown: function() {
+describe('express-busboy: file upload', function() {
+
+    before(function(done) {
+        portfinder.getPort(function(e, p) {
+            port = p;
+            setup(app);
+            base += p;
+            done();
+        });
+    });
+
+    after(function() {
         app._server.close();
-    }
-};
+    });
 
-vows.describe('express-busboy: file upload').addBatch(tests).export(module);
+    it('should upload a file', function(done) {
+        var r = request({
+            method: 'POST',
+            url: base + '/',
+            json: true
+        }, function(err, res, d) {
+            assert.ok(d);
+            assert.ok(d.body);
+            assert.equal(d.body.foobar, 1);
+            assert.ok(d.files);
+            assert.ok(d.files['the-file']);
+            assert.ok(d.files['the-file'].file);
+            assert.ok(fs.existsSync(d.files['the-file'].file));
+            done();
+        });
+        var form = r.form();
+        form.append('foobar', 1);
+        form.append('the-file', fs.createReadStream(__filename));
+    });
+        
+    it('should upload files of the same name', function(done) {
+        var r = request({
+            method: 'POST',
+            url: base + '/',
+            json: true
+        }, function(err, res, d) {
+            assert.ok(d);
+            assert.ok(d.body);
+            assert.equal(d.body.foobar, 1);
+            assert.ok(d.files);
+            assert.ok(d.files['the-file']);
+            assert.equal(true, Array.isArray(d.files['the-file']));
+            assert.ok(d.files['the-file'][0].file);
+            assert.ok(d.files['the-file'][1].file);
+            assert.ok(d.files['the-file'][2].file);
+            assert.ok(fs.existsSync(d.files['the-file'][0].file));
+            assert.ok(fs.existsSync(d.files['the-file'][1].file));
+            assert.ok(fs.existsSync(d.files['the-file'][2].file));
+            done();
+        });
+        var form = r.form();
+        form.append('foobar', 1);
+        form.append('the-file', fs.createReadStream(__filename));
+        form.append('the-file', fs.createReadStream(__filename));
+        form.append('the-file', fs.createReadStream(__filename));
+    });
 
+});
