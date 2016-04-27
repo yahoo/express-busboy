@@ -32,65 +32,65 @@ exports.extend = function(app, options) {
                 req.body = body || {};
                 next();
             });
-        } else {
-            if (!req.busboy) { //Nothing to parse..
-                return next();
-            }
+            return;
+        }
 
-            if (options.upload) {
-                req.busboy.on('file', function(name, file, filename, encoding, mimetype) {
-                    var fileUuid = uuid.v4(),
-                        out = path.join(options.path, '/', fileUuid, '/', name, filename);
-                    
-                    /*istanbul ignore next*/
-                    if (!filename || filename === '') {
-                        return;
-                    }
+        if (!req.busboy) { //Nothing to parse..
+            return next();
+        }
+        if (options.upload) {
+            req.busboy.on('file', function(name, file, filename, encoding, mimetype) {
+                var fileUuid = uuid.v4(),
+                    out = path.join(options.path, '/', fileUuid, '/', name, filename);
+                
+                /*istanbul ignore next*/
+                if (!filename || filename === '') {
+                    return;
+                }
 
 
-                    mkdirp.sync(path.dirname(out));
-                    var writer = fs.createWriteStream(out);
-                    file.pipe(writer);
-                    var data = {
-                        uuid: fileUuid,
-                        field: name,
-                        file: out,
-                        filename: filename,
-                        encoding: encoding,
-                        mimetype: mimetype,
-                        truncated: false
-                    };
+                mkdirp.sync(path.dirname(out));
+                var writer = fs.createWriteStream(out);
+                file.pipe(writer);
+                var data = {
+                    uuid: fileUuid,
+                    field: name,
+                    file: out,
+                    filename: filename,
+                    encoding: encoding,
+                    mimetype: mimetype,
+                    truncated: false
+                };
 
-                    // Indicate whether the file was truncated
-                    /*istanbul ignore next*/
-                    file.on('limit', function() {
-                        data.truncated = true;
-                    });
-
-                    if (Array.isArray(req.files[name])) {
-                        req.files[name].push(data);
-                    } else if (req.files[name]) {
-                        req.files[name] = [req.files[name], data];
-                    } else {
-                        req.files[name] = data;
-                    }
+                // Indicate whether the file was truncated
+                /*istanbul ignore next*/
+                file.on('limit', function() {
+                    data.truncated = true;
                 });
-            }
-            req.busboy.on('field', function(fieldname, val) {
-                if (Array.isArray(req.body[fieldname])) {
-                    req.body[fieldname].push(val);
-                } else if (req.body[fieldname]) {
-                    req.body[fieldname] = [req.body[fieldname], val];
+
+                if (Array.isArray(req.files[name])) {
+                    req.files[name].push(data);
+                } else if (req.files[name]) {
+                    req.files[name] = [req.files[name], data];
                 } else {
-                    req.body[fieldname] = val;
+                    req.files[name] = data;
                 }
             });
-            req.busboy.on('finish', function() {
-                req.body = qs.parse(qs.stringify(req.body));
-                next();
-            });
-            req.pipe(req.busboy);
         }
+        req.busboy.on('field', function(fieldname, val) {
+            if (Array.isArray(req.body[fieldname])) {
+                req.body[fieldname].push(val);
+            } else if (req.body[fieldname]) {
+                req.body[fieldname] = [req.body[fieldname], val];
+            } else {
+                req.body[fieldname] = val;
+            }
+        });
+        req.busboy.on('finish', function() {
+            req.body = qs.parse(qs.stringify(req.body));
+            next();
+        });
+        req.pipe(req.busboy);
     });
 
     return app;
