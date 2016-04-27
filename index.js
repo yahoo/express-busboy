@@ -27,7 +27,7 @@ exports.extend = function(app, options) {
         req.body = {};
         req.files = {};
 
-        if (req.is('json')) {
+        if (req.is('json') && req.readable) {
             jsonBody(req, res, options, function(err, body) {
                 req.body = body || {};
                 next();
@@ -36,6 +36,7 @@ exports.extend = function(app, options) {
             if (!req.busboy) { //Nothing to parse..
                 return next();
             }
+
             if (options.upload) {
                 req.busboy.on('file', function(name, file, filename, encoding, mimetype) {
                     var fileUuid = uuid.v4(),
