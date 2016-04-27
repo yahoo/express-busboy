@@ -41,6 +41,12 @@ exports.extend = function(app, options) {
                 req.busboy.on('file', function(name, file, filename, encoding, mimetype) {
                     var fileUuid = uuid.v4(),
                         out = path.join(options.path, '/', fileUuid, '/', name, filename);
+                    
+                    /*istanbul ignore next*/
+                    if (!filename || filename === '') {
+                        return;
+                    }
+
 
                     mkdirp.sync(path.dirname(out));
                     var writer = fs.createWriteStream(out);
