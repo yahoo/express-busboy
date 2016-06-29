@@ -37,10 +37,10 @@ exports.extend = function(app, options) {
 
         var allowUpload = false;
 
-        if (typeof options.uploadPath == 'function') {
-            allowUpload = !!options.uploadPath(req.url);
-        } else if (typeof options.uploadPath == 'object' && typeof options.uploadPath.test == 'function') {
-            allowUpload = !!options.uploadPath.test(req.url);
+        if (typeof options.allowedPath == 'function') {
+            allowUpload = !!options.allowedPath(req.url);
+        } else if (typeof options.allowedPath == 'object' && typeof options.allowedPath.test == 'function') {
+            allowUpload = !!options.allowedPath.test(req.url);
         } else {
             allowUpload = true;
         }
