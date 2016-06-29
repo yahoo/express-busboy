@@ -45,10 +45,10 @@ exports.extend = function(app, options) {
             allowUpload = true;
         }
 
-        if (!req.busboy || !allowUpload) { //Nothing to parse..
+        if (!req.busboy) { //Nothing to parse..
             return next();
         }
-        if (options.upload) {
+        if (options.upload && allowUpload) {
             req.busboy.on('file', function(name, file, filename, encoding, mimetype) {
                 var fileUuid = uuid.v4(),
                     out = path.join(options.path, '/', fileUuid, '/', name, filename);
