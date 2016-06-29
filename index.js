@@ -55,6 +55,7 @@ exports.extend = function(app, options) {
 
                 /*istanbul ignore next*/
                 if (!filename || filename === '') {
+                    file.on('data', function() {});
                     return;
                 }
 
