@@ -1,7 +1,7 @@
 express-busboy
 --------------
 
-A simple `body-parser` like module for express that 
+A simple `body-parser` like module for express that
 uses [`connect-busboy`](https://github.com/mscdex/connect-busboy) under the hood.
 
 It's designed to be more of a "drop in" replacement for `body-parser`.
@@ -36,13 +36,23 @@ By default file uploads are disabled, the `req.files` object will always be empt
 ```js
 bb.extend(app, {
     upload: true,
-    path: '/path/to/save/files'
+    path: '/path/to/save/files',
+    allowedPath: /./
 });
 ```
 
 `path` will default to: `os.tmpdir()/express-busboy/<uuid>/<the field name>/<filename>`.
 
-If needed, we could potentially add a filter for which url's have the ability to upload files.
+allowedPath can contain a regular expression limiting the upload function to given urls. For example `/^\/upload$/` would only allow uploads in the /upload path.
+
+
+You can have a function returning true/false if you prefer that:
+
+```js
+options.allowedPath = function(url) {
+    return url == '/upload';
+}
+```
 
 build
 -----
