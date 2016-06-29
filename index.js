@@ -35,14 +35,24 @@ exports.extend = function(app, options) {
             return;
         }
 
-        if (!req.busboy) { //Nothing to parse..
+        var allowUpload = false;
+
+        if (typeof options.uploadPath == 'function') {
+            allowUpload = !!options.uploadPath(req.url);
+        } else if (typeof options.uploadPath == 'object' && typeof options.uploadPath.test == 'function') {
+            allowUpload = !!options.uploadPath.test(req.url);
+        } else {
+            allowUpload = true;
+        }
+
+        if (!req.busboy || !allowUpload) { //Nothing to parse..
             return next();
         }
         if (options.upload) {
             req.busboy.on('file', function(name, file, filename, encoding, mimetype) {
                 var fileUuid = uuid.v4(),
                     out = path.join(options.path, '/', fileUuid, '/', name, filename);
-                
+
                 /*istanbul ignore next*/
                 if (!filename || filename === '') {
                     return;
