@@ -20,11 +20,23 @@ exports.extend = function(app, options) {
     options = options || {};
     options.immediate = false; //Remove if the user sets it
     options.path = options.path || path.join(os.tmpdir(), 'express-busboy');
+    var mimeTypeLimit;
+
+    if (options.mimeTypeLimit) {
+        if ( Array.isArray(options.mimeTypeLimit) ) {
+            mimeTypeLimit = options.mimeTypeLimit;
+        };
+
+        delete options.mimeTypeLimit;
+    }
 
     app.use(busboy(options));
 
     app.use(function(req, res, next) {
-        req.body = {};
+        if (!req.body) {  //to prevent overwriting
+            req.body = {};
+        }
+
         req.files = {};
 
         if (req.is('json') && req.readable) {
@@ -52,6 +64,27 @@ exports.extend = function(app, options) {
             req.busboy.on('file', function(name, file, filename, encoding, mimetype) {
                 var fileUuid = uuid.v4(),
                     out = path.join(options.path, '/', fileUuid, '/', name, filename);
+                
+                if (mimeTypeLimit) {
+                    var i = 0;
+                    var isNeedMimeType = false;
+                    var mimeTypeLimitLength = mimeTypeLimit.length;
+                    
+                    for (; i < mimeTypeLimitLength; i++) {
+                        if ( mimetype === mimeTypeLimit[i] ) {
+                            isNeedMimeType = true;
+                            break;
+                        }
+                    }
+
+                    if ( !isNeedMimeType ) {
+                        var err = new Error;
+                        err.message = 'Incorrectly mimetype';
+                        err.statusCode = 400;
+                        file.resume();
+                        return next(err);;
+                    }
+                }
 
                 /*istanbul ignore next*/
                 if (!filename || filename === '') {
@@ -70,7 +103,7 @@ exports.extend = function(app, options) {
                     filename: filename,
                     encoding: encoding,
                     mimetype: mimetype,
-                    truncated: false
+                    truncated: false,
                 };
 
                 // Indicate whether the file was truncated
