@@ -54,6 +54,20 @@ options.allowedPath = function(url) {
 }
 ```
 
+You can restrict uploads to specific mimetypes as well:
+
+```js
+options.mimeTypeLimit = [
+    'text/x-markdown',
+    'application/javascript',
+    'image/jpeg',
+    'image/png'
+];
+```
+
+When files are not uploaded due to path or mimetype checks, no error is returned (so the other data in the request can be handled) the restricted item
+will simply not appear in the `req.files` `Object`.
+
 build
 -----
 

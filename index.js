@@ -20,24 +20,20 @@ exports.extend = function(app, options) {
     options = options || {};
     options.immediate = false; //Remove if the user sets it
     options.path = options.path || path.join(os.tmpdir(), 'express-busboy');
-    var mimeTypeLimit;
+    var mimeTypeLimit = options.mimeTypeLimit;
+    delete options.mimeTypeLimit;
 
-    if (options.mimeTypeLimit) {
-        if ( Array.isArray(options.mimeTypeLimit) ) {
-            mimeTypeLimit = options.mimeTypeLimit;
-        };
-
-        delete options.mimeTypeLimit;
+    if (mimeTypeLimit) {
+        if (!Array.isArray(mimeTypeLimit)) {
+            mimeTypeLimit = [mimeTypeLimit];
+        }
     }
 
     app.use(busboy(options));
 
     app.use(function(req, res, next) {
-        if (!req.body) {  //to prevent overwriting
-            req.body = {};
-        }
-
-        req.files = {};
+        req.body = req.body || {};
+        req.files = req.files || {};
 
         if (req.is('json') && req.readable) {
             jsonBody(req, res, options, function(err, body) {
@@ -63,26 +59,17 @@ exports.extend = function(app, options) {
         if (options.upload && allowUpload) {
             req.busboy.on('file', function(name, file, filename, encoding, mimetype) {
                 var fileUuid = uuid.v4(),
+                    isValidMimeType,
                     out = path.join(options.path, '/', fileUuid, '/', name, filename);
                 
                 if (mimeTypeLimit) {
-                    var i = 0;
-                    var isNeedMimeType = false;
-                    var mimeTypeLimitLength = mimeTypeLimit.length;
+                    isValidMimeType = mimeTypeLimit.some(function(type) {
+                        return type === mimetype;
+                    });
                     
-                    for (; i < mimeTypeLimitLength; i++) {
-                        if ( mimetype === mimeTypeLimit[i] ) {
-                            isNeedMimeType = true;
-                            break;
-                        }
-                    }
-
-                    if ( !isNeedMimeType ) {
-                        var err = new Error;
-                        err.message = 'Incorrectly mimetype';
-                        err.statusCode = 400;
+                    if (!isValidMimeType) {
                         file.resume();
-                        return next(err);;
+                        return;
                     }
                 }
 
@@ -103,7 +90,7 @@ exports.extend = function(app, options) {
                     filename: filename,
                     encoding: encoding,
                     mimetype: mimetype,
-                    truncated: false,
+                    truncated: false
                 };
 
                 // Indicate whether the file was truncated
