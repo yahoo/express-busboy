@@ -67,9 +67,9 @@ exports.extend = function(app, options) {
 
         var allowUpload = false;
 
-        if (typeof options.allowedPath == 'function') {
+        if (typeof options.allowedPath === 'function') {
             allowUpload = !!options.allowedPath(req.url);
-        } else if (typeof options.allowedPath == 'object' && typeof options.allowedPath.test == 'function') {
+        } else if (typeof options.allowedPath === 'object' && typeof options.allowedPath.test === 'function') {
             allowUpload = !!options.allowedPath.test(req.url);
         } else {
             allowUpload = true;

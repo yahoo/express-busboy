@@ -6,7 +6,6 @@
 var assert = require('assert'),
     bb = require('../'),
     express = require('express'),
-    fs = require('fs'),
     request = require('request'),
     http = require('http'),
     portfinder = require('portfinder');
