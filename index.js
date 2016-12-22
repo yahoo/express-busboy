@@ -14,15 +14,37 @@ var busboy = require('connect-busboy'),
     os = require('os'),
     jsonBody = require('body/json');
 
+var fixDups = function(item) {
+    Object.keys(item).forEach(function(field) {
+        if (Array.isArray(item[field])) {
+            item['__' + field + '__'] = item[field];
+            item[field] = item[field][0];
+        }
+    });
+    return item;
+};
+
+var convertParams = function(item, name, data) {
+    if (Array.isArray(item[name])) {
+        item[name].push(data);
+    } else if (item[name]) {
+        item[name] = [item[name], data];
+    } else {
+        item[name] = data;
+    }
+};
+
 exports.extend = function(app, options) {
     if (app[key]) { return app; }
     Object.defineProperty(app, key, { value: exports });
     options = options || {};
     options.immediate = false; //Remove if the user sets it
     options.path = options.path || path.join(os.tmpdir(), 'express-busboy');
+    var restrictMultiple = options.restrictMultiple;
+    delete options.restrictMultiple;
     var mimeTypeLimit = options.mimeTypeLimit;
     delete options.mimeTypeLimit;
-
+    
     if (mimeTypeLimit) {
         if (!Array.isArray(mimeTypeLimit)) {
             mimeTypeLimit = [mimeTypeLimit];
@@ -98,27 +120,18 @@ exports.extend = function(app, options) {
                 file.on('limit', function() {
                     data.truncated = true;
                 });
-
-                if (Array.isArray(req.files[name])) {
-                    req.files[name].push(data);
-                } else if (req.files[name]) {
-                    req.files[name] = [req.files[name], data];
-                } else {
-                    req.files[name] = data;
-                }
+                
+                convertParams(req.files, name, data);
             });
         }
-        req.busboy.on('field', function(fieldname, val) {
-            if (Array.isArray(req.body[fieldname])) {
-                req.body[fieldname].push(val);
-            } else if (req.body[fieldname]) {
-                req.body[fieldname] = [req.body[fieldname], val];
-            } else {
-                req.body[fieldname] = val;
-            }
+        req.busboy.on('field', function(name, data) {
+            convertParams(req.body, name, data);
         });
         req.busboy.on('finish', function() {
             req.body = qs.parse(qs.stringify(req.body));
+            if (restrictMultiple) {
+                [req.body, req.files].forEach(fixDups);
+            }
             next();
         });
         req.pipe(req.busboy);

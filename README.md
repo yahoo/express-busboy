@@ -24,9 +24,13 @@ configuration
 
 ```js
 bb.extend(app, {
-    //busboy options can go here
+    //options can go here
 });
 ```
+
+By default this module will create an `Array` when it finds multiple fields with the
+same name in the POST parameters. You can set `restrictMultiple` to `true` to 
+not parse mutiple POST values into `Array`'s
 
 file uploads
 ------------
