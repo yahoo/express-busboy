@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jenkins-mocha tests/*.js",
-    "posttest": "istanbul check-coverage"
+    "posttest": "nyc report"
   },
   "repository": {
     "type": "git",
@@ -30,10 +30,21 @@
   },
   "devDependencies": {
     "express": "~4.8.6",
-    "istanbul": "^0.4.3",
-    "jenkins-mocha": "^2.6.0",
     "portfinder": "~0.2.1",
-    "request": "~2.40.0"
+    "request": "~2.40.0",
+    "jenkins-mocha": "^4.0.0",
+    "nyc": "^10.0.0"
+  },
+    "nyc": {
+    "lines": 100,
+    "statements": 100,
+    "functions": 100,
+    "branches": 100,
+    "check-coverage": true,
+    "reporter": [
+      "text",
+      "text-summary"
+    ]
   },
   "license": "BSD-3-Clause"
 }
