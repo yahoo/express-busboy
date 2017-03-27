@@ -78,6 +78,31 @@ exports.extend = function(app, options) {
             }
         }
 
+        let bbDone = false;
+
+        const finish = () => {
+            /*istanbul ignore next*/
+            if (!bbDone) {
+                return; //bail busboy is still running
+            }
+            //Busboy is done, check the files
+            let complete = true;
+            Object.keys(req.files).forEach((name) => {
+                let file = req.files[name];
+                if (!Array.isArray(file)) {
+                    file = [file];
+                }
+                file.forEach((f) => {
+                    if (!f.done) { //file is not done writing
+                        complete = false;
+                    }
+                });
+            });
+            if (complete) { //all files are done writing..
+                next();
+            }
+        };
+
         if (options.upload && allowUpload) {
             req.busboy.on('file', (name, file, filename, encoding, mimetype) => {
                 const fileUuid = uuid.v4();
@@ -91,11 +116,7 @@ exports.extend = function(app, options) {
                 if (!filename || filename === '') {
                     return file.on('data', () => { });
                 }
-
-
-                mkdirp.sync(path.dirname(out));
-                const writer = fs.createWriteStream(out);
-                file.pipe(writer);
+                
                 const data = {
                     uuid: fileUuid,
                     field: name,
@@ -103,8 +124,17 @@ exports.extend = function(app, options) {
                     filename: filename,
                     encoding: encoding,
                     mimetype: mimetype,
-                    truncated: false
+                    truncated: false,
+                    done: false
                 };
+
+                mkdirp.sync(path.dirname(out));
+                const writer = fs.createWriteStream(out);
+                writer.on('finish', () => {
+                    data.done = true;
+                    finish();
+                });
+                file.pipe(writer);
 
                 // Indicate whether the file was truncated
                 /*istanbul ignore next*/
@@ -123,7 +153,8 @@ exports.extend = function(app, options) {
             if (restrictMultiple) {
                 [req.body, req.files].forEach(fixDups);
             }
-            next();
+            bbDone = true;
+            finish();
         });
         req.pipe(req.busboy);
     });
