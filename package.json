@@ -30,12 +30,12 @@
     "uuid": "~1.4.1"
   },
   "devDependencies": {
-    "eslint": "^3.12.2",
-    "express": "~4.8.6",
-    "jenkins-mocha": "^4.0.0",
-    "nyc": "^10.0.0",
+    "eslint": "^5.9.0",
+    "express": "^4.16.4",
+    "jenkins-mocha": "^6.0.0",
+    "nyc": "^13.1.0",
     "portfinder": "~0.2.1",
-    "request": "~2.40.0"
+    "request": "^2.88.0"
   },
   "nyc": {
     "lines": 100,
