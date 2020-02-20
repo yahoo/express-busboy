@@ -10,10 +10,28 @@ var assert = require('assert'),
     request = require('request'),
     portfinder = require('portfinder');
 
-var port;
-var app = express();
-bb.extend(app, { upload: true });
-var base = 'http://127.0.0.1:';
+var port, app, base;
+var restartServer = (opts, cb) => {
+    closeServer(() => {
+        app = express();
+        bb.extend(app, opts);
+        base = 'http://127.0.0.1:';
+        portfinder.getPort(function(e, p) {
+            port = p;
+            setup(app);
+            base += p;
+            cb();
+        });
+    });
+};
+var closeServer = (cb) => {
+    if (app) {
+        app._server.close(cb);
+        app = undefined;
+    } else {
+        cb();
+    }
+};
 var setup = function(app) {
     app._server = app.listen(port);
     app.all('/', function(req, res) {
@@ -27,16 +45,11 @@ var setup = function(app) {
 describe('express-busboy: file upload', function() {
 
     before(function(done) {
-        portfinder.getPort(function(e, p) {
-            port = p;
-            setup(app);
-            base += p;
-            done();
-        });
+        restartServer({ upload: true }, done);
     });
 
-    after(function() {
-        app._server.close();
+    after(function(done) {
+        closeServer(done);
     });
 
     it('should upload a file', function(done) {
@@ -84,6 +97,36 @@ describe('express-busboy: file upload', function() {
         form.append('the-file', fs.createReadStream(__filename));
         form.append('the-file', fs.createReadStream(__filename));
         form.append('the-file', fs.createReadStream(__filename));
+    });
+
+    it('should strip name param for write', function(done) {
+        const name = __dirname;
+        // we want to change options for just this test, so restart the server
+        restartServer({
+            upload: true,
+            strip: (value) => {
+                return value.replace(/.*\//, '');
+            }
+        }, () => {
+            var r = request({
+                method: 'POST',
+                url: base + '/',
+                json: true
+            }, function(err, res, d) {
+                assert.ok(d);
+                assert.ok(d.body);
+                assert.equal(d.body.foobar, 1);
+                assert.ok(d.files);
+                assert.ok(d.files[name]);
+                assert.ok(!d.files[name].file.match(new RegExp(name)));
+                assert.ok(d.files[name].file.match(new RegExp(d.files[name].uuid)));
+                assert.ok(fs.existsSync(d.files[name].file));
+                done();
+            });
+            var form = r.form();
+            form.append('foobar', 1);
+            form.append(name, fs.createReadStream(__filename), 'hello/foobar');
+        });
     });
 
 });

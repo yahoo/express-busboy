@@ -69,6 +69,15 @@ options.mimeTypeLimit = [
 ];
 ```
 
+Name and filename inputs will be sanitized before determining path for the file on disk.  If you want to change this behavior you can provide a strip function of your own:
+
+```js
+// this will not sanitize the inputs
+options.strip = function(value, type) {
+    return value;
+}
+```
+
 When files are not uploaded due to path or mimetype checks, no error is returned (so the other data in the request can be handled) the restricted item
 will simply not appear in the `req.files` `Object`.
 

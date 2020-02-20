@@ -25,6 +25,11 @@ const fixDups = (item) => {
     return item;
 };
 
+const stripRegexp = /.*\//;
+const strip = (value) => {
+    return value.replace(stripRegexp, '');
+};
+
 var convertParams = (item, name, data) => {
     if (Array.isArray(item[name])) {
         item[name].push(data);
@@ -41,6 +46,7 @@ exports.extend = function(app, options) {
     options = options || {};
     options.immediate = false; //Remove if the user sets it
     options.path = options.path || path.join(os.tmpdir(), 'express-busboy');
+    options.strip = (options.strip && options.strip instanceof Function) ? options.strip : strip;
     const restrictMultiple = options.restrictMultiple;
     const mimeTypeLimit = options.mimeTypeLimit ? !Array.isArray(options.mimeTypeLimit) ? [options.mimeTypeLimit] : options.mimeTypeLimit : null;
     delete options.restrictMultiple;
@@ -106,14 +112,16 @@ exports.extend = function(app, options) {
         if (options.upload && allowUpload) {
             req.busboy.on('file', (name, file, filename, encoding, mimetype) => {
                 const fileUuid = uuid.v4();
-                const out = path.join(options.path, '/', fileUuid, '/', name, filename);
+                const nameStripped = options.strip(name, 'name');
+                const filenameStripped = options.strip(filename || /*istanbul ignore next*/ '', 'filename');
+                const out = path.join(options.path, '/', fileUuid, '/', nameStripped, filenameStripped);
                 
                 if (mimeTypeLimit && !mimeTypeLimit.some(type => { return type === mimetype; })) {
                     return file.resume();
                 }
 
                 /*istanbul ignore next*/
-                if (!filename || filename === '') {
+                if (!filename || filenameStripped === '') {
                     return file.on('data', () => { });
                 }
                 
