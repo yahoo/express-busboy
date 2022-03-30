@@ -1,4 +1,4 @@
-# express-busboy
+# express-busboy [![npm version](https://badge.fury.io/js/express-busboy.svg)](http://badge.fury.io/js/express-busboy) ![Build Status](https://github.com/yahoo/express-busboy/actions/workflows/test.yml/badge.svg)
 
 A simple `body-parser` like module for express that
 uses [`connect-busboy`](https://github.com/mscdex/connect-busboy) under the hood.
@@ -79,8 +79,3 @@ options.strip = function(value, type) {
 
 When files are not uploaded due to path or mimetype checks, no error is returned (so the other data in the request can be handled) the restricted item
 will simply not appear in the `req.files` `Object`.
-
-build
------
-
-[![Build Status](https://travis-ci.org/yahoo/express-busboy.svg?branch=master)](https://travis-ci.org/yahoo/express-busboy)
