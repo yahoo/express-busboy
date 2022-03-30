@@ -5,7 +5,7 @@
   "author": "Dav Glass <davglass@gmail.com>",
   "main": "index.js",
   "scripts": {
-    "pretest": "eslint --fix .",
+    "lint": "eslint --fix .",
     "test": "jenkins-mocha tests/*.js",
     "posttest": "nyc report"
   },
@@ -30,9 +30,9 @@
     "uuid": "~1.4.1"
   },
   "devDependencies": {
-    "eslint": "^5.9.0",
+    "eslint": "^8.12.0",
     "express": "^4.16.4",
-    "jenkins-mocha": "^6.0.0",
+    "jenkins-mocha": "^9.0.0",
     "nyc": "^13.1.0",
     "portfinder": "~0.2.1",
     "request": "^2.88.0"
