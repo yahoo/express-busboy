@@ -1,5 +1,4 @@
-express-busboy
---------------
+# express-busboy
 
 A simple `body-parser` like module for express that
 uses [`connect-busboy`](https://github.com/mscdex/connect-busboy) under the hood.
@@ -11,8 +10,8 @@ usage
 -----
 
 ```js
-var bb = require('express-busboy');
-var app = express();
+import bb from 'express-busboy';
+const app = express();
 
 bb.extend(app);
 ```
