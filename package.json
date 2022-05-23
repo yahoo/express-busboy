@@ -23,10 +23,10 @@
   },
   "homepage": "https://github.com/yahoo/express-busboy",
   "dependencies": {
-    "body": "~5.1.0",
-    "connect-busboy": "~0.0.1",
+    "body": "^5.1.0",
+    "connect-busboy": "^1.0.0",
     "mkdirp": "^1.0.4",
-    "qs": "^6.4.0",
+    "qs": "^6.10.3",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
