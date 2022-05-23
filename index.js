@@ -110,13 +110,14 @@ exports.extend = function(app, options) {
         };
 
         if (options.upload && allowUpload) {
-            req.busboy.on('file', (name, file, filename, encoding, mimetype) => {
+            req.busboy.on('file', (name, file, info) => {
+                const { filename, encoding, mimeType } = info;
                 const fileUuid = uuid.v4();
                 const nameStripped = options.strip(name, 'name');
                 const filenameStripped = options.strip(filename || /*istanbul ignore next*/ '', 'filename');
                 const out = path.join(options.path, '/', fileUuid, '/', nameStripped, filenameStripped);
                 
-                if (mimeTypeLimit && !mimeTypeLimit.some(type => { return type === mimetype; })) {
+                if (mimeTypeLimit && !mimeTypeLimit.some(type => { return type === mimeType; })) {
                     return file.resume();
                 }
 
@@ -131,7 +132,7 @@ exports.extend = function(app, options) {
                     file: out,
                     filename: filename,
                     encoding: encoding,
-                    mimetype: mimetype,
+                    mimetype: mimeType,
                     truncated: false,
                     done: false
                 };
@@ -156,7 +157,7 @@ exports.extend = function(app, options) {
         req.busboy.on('field', (name, data) => {
             convertParams(req.body, name, data);
         });
-        req.busboy.on('finish', () => {
+        req.busboy.on('close', () => {
             req.body = qs.parse(qs.stringify(req.body), { arrayLimit: options.arrayLimit });
             if (restrictMultiple) {
                 [req.body, req.files].forEach(fixDups);
