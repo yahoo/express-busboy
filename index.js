@@ -51,23 +51,24 @@ exports.extend = function(app, options) {
     const mimeTypeLimit = options.mimeTypeLimit ? !Array.isArray(options.mimeTypeLimit) ? [options.mimeTypeLimit] : options.mimeTypeLimit : null;
     delete options.restrictMultiple;
     delete options.mimeTypeLimit;
-    
+
     app.use(busboy(options));
 
     app.use((req, res, next) => {
         var allowUpload = true;
-        
+
         req.body = req.body || {};
         req.files = req.files || {};
 
         if (req.is('json') && req.readable) {
+            req.rawBody = req.body;
             jsonBody(req, res, options, (err, body) => {
                 req.body = body || {};
                 next();
             });
             return;
         }
-        
+
         if (!req.busboy) { //Nothing to parse..
             return next();
         }
@@ -116,7 +117,7 @@ exports.extend = function(app, options) {
                 const nameStripped = options.strip(name, 'name');
                 const filenameStripped = options.strip(filename || /*istanbul ignore next*/ '', 'filename');
                 const out = path.join(options.path, '/', fileUuid, '/', nameStripped, filenameStripped);
-                
+
                 if (mimeTypeLimit && !mimeTypeLimit.some(type => { return type === mimeType; })) {
                     return file.resume();
                 }
@@ -125,7 +126,7 @@ exports.extend = function(app, options) {
                 if (!filename || filenameStripped === '') {
                     return file.on('data', () => { });
                 }
-                
+
                 const data = {
                     uuid: fileUuid,
                     field: name,
@@ -150,7 +151,7 @@ exports.extend = function(app, options) {
                 file.on('limit', () => {
                     data.truncated = true;
                 });
-                
+
                 convertParams(req.files, name, data);
             });
         }
