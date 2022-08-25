@@ -11,6 +11,7 @@ var assert = require('assert'),
     http = require('http'),
     portfinder = require('portfinder');
 
+var internalControllerRequest;
 var port;
 var app = express();
 bb.extend(app);
@@ -18,6 +19,7 @@ var base = 'http://127.0.0.1:';
 var setup = function(app) {
     app._server = app.listen(port);
     app.all('/', function(req, res) {
+        internalControllerRequest = req;
         res.send({
             body: req.body,
             files: req.files
@@ -198,4 +200,21 @@ describe('express-busboy: json', function() {
         form.append('the-file', fs.createReadStream(__filename));
     });
 
+    it('should assign the pre-parsed body to "rawBody"', function(done) {
+        request({
+            method: 'POST',
+            url: base + '/',
+            json: {
+                foo: 1,
+            }
+        }, function(err, res, d) {
+            assert.ok(d);
+            assert.ok(d.body);
+            assert.ok(d.files);
+            assert.equal(Object.keys(d.files).length, 0);
+            assert.equal(d.body.foo, 1);
+            assert.equal(internalControllerRequest.rawBody, '{"foo":1}');
+            done();
+        });
+    });
 });

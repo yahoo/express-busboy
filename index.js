@@ -61,8 +61,29 @@ exports.extend = function(app, options) {
         req.files = req.files || {};
 
         if (req.is('json') && req.readable) {
-            req.rawBody = req.body;
-            jsonBody(req, res, options, (err, body) => {
+            const userProvidedJSONParser = (options.JSON && options.JSON.parse);
+            const subOptions = Object.assign({}, options, {
+                JSON: {
+                    parse: function(bodyStr, _reviver, done) {
+                        req.rawBody = bodyStr;
+
+                        // If a JSON parser was provided
+                        // by the user, then let it handle
+                        // the parsing.
+                        if (typeof userProvidedJSONParser === 'function')
+                            return userProvidedJSONParser.call(this, bodyStr, _reviver, done);
+
+                        try {
+                            var result = JSON.parse(bodyStr, _reviver);
+                            return done.call(this, null, result);
+                        } catch (error) {
+                            return done.call(this, error);
+                        }
+                    },
+                },
+            });
+
+            jsonBody(req, res, subOptions, (err, body) => {
                 req.body = body || {};
                 next();
             });
