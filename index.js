@@ -14,6 +14,7 @@ const mkdirp = require('mkdirp');
 const qs = require('qs');
 const os = require('os');
 const jsonBody = require('body/json');
+const crypto = require('crypto');
 
 const fixDups = (item) => {
     Object.keys(item).forEach((field) => {
@@ -25,9 +26,12 @@ const fixDups = (item) => {
     return item;
 };
 
-const stripRegexp = /.*\//;
+const md5 = (value) => {
+    return crypto.createHash('md5').update(value).digest("hex");
+};
+
 const strip = (value) => {
-    return value.replace(stripRegexp, '');
+    return md5(value);
 };
 
 var convertParams = (item, name, data) => {
