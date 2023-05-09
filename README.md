@@ -28,7 +28,7 @@ bb.extend(app, {
 ```
 
 By default this module will create an `Array` when it finds multiple fields with the
-same name in the POST parameters. You can set `restrictMultiple` to `true` to 
+same name in the POST parameters. You can set `restrictMultiple` to `true` to
 not parse mutiple POST values into `Array`'s
 
 file uploads
@@ -46,8 +46,7 @@ bb.extend(app, {
 
 `path` will default to: `os.tmpdir()/express-busboy/<uuid>/<the field name>/<filename>`.
 
-allowedPath can contain a regular expression limiting the upload function to given urls. For example `/^\/upload$/` would only allow uploads in the /upload path.
-
+`allowedPath` can contain a regular expression limiting the upload function to given urls. For example `/^\/upload$/` would only allow uploads in the /upload path.
 
 You can have a function returning true/false if you prefer that:
 
@@ -68,7 +67,7 @@ options.mimeTypeLimit = [
 ];
 ```
 
-Name and filename inputs will be sanitized before determining path for the file on disk.  If you want to change this behavior you can provide a strip function of your own:
+Name and filename inputs will be sanitized into an MD5 hash before determining path for the file on disk.  If you want to change this behavior you can provide a strip function of your own:
 
 ```js
 // this will not sanitize the inputs
@@ -77,5 +76,4 @@ options.strip = function(value, type) {
 }
 ```
 
-When files are not uploaded due to path or mimetype checks, no error is returned (so the other data in the request can be handled) the restricted item
-will simply not appear in the `req.files` `Object`.
+When files are not uploaded due to path or mimetype checks, no error is returned (so the other data in the request can be handled) the restricted item will simply not appear in the `req.files` `Object`.
