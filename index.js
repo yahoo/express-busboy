@@ -27,7 +27,7 @@ const fixDups = (item) => {
 };
 
 const md5 = (value) => {
-    return crypto.createHash('md5').update(value).digest("hex");
+    return crypto.createHash('md5').update(value).digest('hex');
 };
 
 const strip = (value) => {
@@ -45,34 +45,47 @@ var convertParams = (item, name, data) => {
 };
 
 exports.extend = function(app, options) {
-    if (app[key]) { return app; }
+    if (app[key]) {
+        return app;
+    }
     Object.defineProperty(app, key, { value: exports });
     options = options || {};
     options.immediate = false; //Remove if the user sets it
+    options.parseBody = typeof options.parseBody === 'boolean' ? options.parseBody : true;
     options.path = options.path || path.join(os.tmpdir(), 'express-busboy');
-    options.strip = (options.strip && options.strip instanceof Function) ? options.strip : strip;
+    options.strip = options.strip && options.strip instanceof Function ? options.strip : strip;
     const restrictMultiple = options.restrictMultiple;
-    const mimeTypeLimit = options.mimeTypeLimit ? !Array.isArray(options.mimeTypeLimit) ? [options.mimeTypeLimit] : options.mimeTypeLimit : null;
+    const mimeTypeLimit = options.mimeTypeLimit
+        ? !Array.isArray(options.mimeTypeLimit)
+            ? [options.mimeTypeLimit]
+            : options.mimeTypeLimit
+        : null;
     delete options.restrictMultiple;
     delete options.mimeTypeLimit;
-    
+
     app.use(busboy(options));
 
     app.use((req, res, next) => {
         var allowUpload = true;
-        
+
         req.body = req.body || {};
         req.files = req.files || {};
 
         if (req.is('json') && req.readable) {
+            if (!options.parseBody) {
+                // skip parsing body if parseBody is false
+                next();
+                return;
+            }
             jsonBody(req, res, options, (err, body) => {
                 req.body = body || {};
                 next();
             });
             return;
         }
-        
-        if (!req.busboy) { //Nothing to parse..
+
+        if (!req.busboy) {
+            //Nothing to parse..
             return next();
         }
 
@@ -103,12 +116,14 @@ exports.extend = function(app, options) {
                     file = [file];
                 }
                 file.forEach((f) => {
-                    if (!f.done) { //file is not done writing
+                    if (!f.done) {
+                        //file is not done writing
                         complete = false;
                     }
                 });
             });
-            if (complete) { //all files are done writing..
+            if (complete) {
+                //all files are done writing..
                 next();
             }
         };
@@ -120,16 +135,21 @@ exports.extend = function(app, options) {
                 const nameStripped = options.strip(name, 'name');
                 const filenameStripped = options.strip(filename || /*istanbul ignore next*/ '', 'filename');
                 const out = path.join(options.path, '/', fileUuid, '/', nameStripped, filenameStripped);
-                
-                if (mimeTypeLimit && !mimeTypeLimit.some(type => { return type === mimeType; })) {
+
+                if (
+                    mimeTypeLimit &&
+                    !mimeTypeLimit.some((type) => {
+                        return type === mimeType;
+                    })
+                ) {
                     return file.resume();
                 }
 
                 /*istanbul ignore next*/
                 if (!filename || filenameStripped === '') {
-                    return file.on('data', () => { });
+                    return file.on('data', () => {});
                 }
-                
+
                 const data = {
                     uuid: fileUuid,
                     field: name,
@@ -154,7 +174,7 @@ exports.extend = function(app, options) {
                 file.on('limit', () => {
                     data.truncated = true;
                 });
-                
+
                 convertParams(req.files, name, data);
             });
         }
